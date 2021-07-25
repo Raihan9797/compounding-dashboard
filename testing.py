@@ -261,6 +261,30 @@ def update_cpd_bar(principal, rate, time):
 
         return fig1, rate
 
+# @app.callback(
+#     [
+#         Output('cpd_bar2', 'figure'),
+#     ],
+#     [
+#         Input('principal_input2', 'value'),
+#         Input(component_id='rate_input2', component_property='value'),
+#         Input('time_input2', 'value'),
+#     ],
+#     # prevent_initial_callback = True,
+# )
+# def update_cpd_bar2(principal2, rate2, time2):
+#     # if null vals, dont update the graph
+#     if rate2 == None or principal2 == None or time2 == None:
+#         raise dash.exceptions.PreventUpdate
+#     else:
+#         df1 = create_cpd_df(principal2, rate2, time2)
+#         print('UPDATE 2')
+#         print(df1)
+#         fig1 = create_cpd_fig(df1)
+# 
+# 
+#         return [fig1]
+
 @app.callback(
     [
         Output('cpd_bar2', 'figure'),
@@ -269,22 +293,27 @@ def update_cpd_bar(principal, rate, time):
         Input('principal_input2', 'value'),
         Input(component_id='rate_input2', component_property='value'),
         Input('time_input2', 'value'),
+
+        Input('con_input2', 'value'),
+        Input('type_con_input2', 'value'),
+        Input('stop_con_input2', 'value'),
+        Input('n_input2', 'value'),
     ],
     # prevent_initial_callback = True,
 )
-def update_cpd_bar2(principal2, rate2, time2):
+def update_cpd_bar2(principal2, rate2, time2, con, type_con, stop_con, n):
     # if null vals, dont update the graph
-    if rate2 == None or principal2 == None or time2 == None:
+    if None in [principal2, rate2, time2, con, type_con, stop_con, n ]:
         raise dash.exceptions.PreventUpdate
     else:
-        df1 = create_cpd_df(principal2, rate2, time2)
+        # df1 = create_cpd_df(principal2, rate2, time2)
+        df1 = cpd_interest_v4(principal2, rate2, time2, con, type_con, stop_con, n)
         print('UPDATE 2')
         print(df1)
-        fig1 = create_cpd_fig(df1)
+        fig1 = create_cpd_fig_v2(df1)
 
 
         return [fig1]
-
 ### app layout and bigger components
 bar_card = dbc.Card(
     [
