@@ -190,14 +190,37 @@ principal_input = dcc.Input(
 rate_input = dcc.Input(
     id = 'rate_input',
     type = 'number',
-    value = 10,
+    value = 0.05,
 )
 time_input = dcc.Input(
     id = 'time_input',
     type = 'number',
-    value = 20,
+    value = 2,
 )
 
+con_input = dcc.Input(
+    id = 'con_input',
+    type = 'number',
+    value = 100,
+)
+type_con_input = dcc.Input(
+    id = 'type_con_input',
+    type = 'number',
+    value = 1,
+)
+stop_con_input = dcc.Input(
+    id = 'stop_con_input',
+    type = 'number',
+    value = 36,
+)
+n_input = dcc.Input(
+    id = 'n_input',
+    type = 'number',
+    value = 12,
+)
+
+
+### bar 2 inputs
 principal_input2 = dcc.Input(
     id = 'principal_input2',
     type = 'number',
@@ -206,60 +229,65 @@ principal_input2 = dcc.Input(
 rate_input2 = dcc.Input(
     id = 'rate_input2',
     type = 'number',
-    value = 10,
+    value = 0.05,
 )
 time_input2 = dcc.Input(
     id = 'time_input2',
     type = 'number',
-    value = 20,
+    value = 2,
 )
 
 con_input2 = dcc.Input(
     id = 'con_input2',
     type = 'number',
-    value = 20,
+    value = 100,
 )
 type_con_input2 = dcc.Input(
     id = 'type_con_input2',
     type = 'number',
-    value = 20,
+    value = 1,
 )
 stop_con_input2 = dcc.Input(
     id = 'stop_con_input2',
     type = 'number',
-    value = 20,
+    value = 36,
 )
 n_input2 = dcc.Input(
     id = 'n_input2',
     type = 'number',
-    value = 20,
+    value = 12,
 )
 
 ### callbacks
 @app.callback(
     [
         Output('cpd_bar', 'figure'),
-        Output('test_div', 'children'),
     ],
     [
         Input('principal_input', 'value'),
         Input(component_id='rate_input', component_property='value'),
         Input('time_input', 'value'),
+
+        Input('con_input', 'value'),
+        Input('type_con_input', 'value'),
+        Input('stop_con_input', 'value'),
+        Input('n_input', 'value'),
     ],
     # prevent_initial_callback = True,
 )
-def update_cpd_bar(principal, rate, time):
+def update_cpd_bar_v2(principal2, rate2, time2, con, type_con, stop_con, n):
     # if null vals, dont update the graph
-    if rate == None or principal == None or time == None:
+    if None in [principal2, rate2, time2, con, type_con, stop_con, n ]:
         raise dash.exceptions.PreventUpdate
     else:
-        df1 = create_cpd_df(principal, rate, time)
-        print('UPDATE 1')
+        # df1 = create_cpd_df(principal2, rate2, time2)
+        df1 = cpd_interest_v4(principal2, rate2, time2, con, type_con, stop_con, n)
+        print('UPDATE 2')
         print(df1)
-        fig1 = create_cpd_fig(df1)
+        fig1 = create_cpd_fig_v2(df1)
 
 
-        return fig1, rate
+        return [fig1]
 
 
 @app.callback(
@@ -291,6 +319,8 @@ def update_cpd_bar2(principal2, rate2, time2, con, type_con, stop_con, n):
 
 
         return [fig1]
+
+
 ### app layout and bigger components
 bar_card = dbc.Card(
     [
@@ -330,6 +360,31 @@ bar_card = dbc.Card(
 
                                     ]
                                 ),
+                                # new addition
+                                html.Div(
+                                    [
+                                        con_label,
+                                        con_input,
+                                    ]
+                                ),
+                                html.Div(
+                                    [
+                                        type_con_label,
+                                        type_con_input,
+                                    ]
+                                ),
+                                html.Div(
+                                    [
+                                        stop_con_label,
+                                        stop_con_input,
+                                    ]
+                                ),
+                                html.Div(
+                                    [
+                                        n_label,
+                                        n_input,
+                                    ]
+                                ),
                             ],
                             style = {
                                 'border': 'solid pink',
@@ -352,6 +407,7 @@ bar_card2 = dbc.Card(
         dbc.CardHeader("Testing header"),
         dbc.CardBody(
             [
+                html.H1('he'),
                 html.Div(
                     [
                         html.Div(
