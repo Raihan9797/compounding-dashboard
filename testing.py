@@ -261,29 +261,6 @@ def update_cpd_bar(principal, rate, time):
 
         return fig1, rate
 
-# @app.callback(
-#     [
-#         Output('cpd_bar2', 'figure'),
-#     ],
-#     [
-#         Input('principal_input2', 'value'),
-#         Input(component_id='rate_input2', component_property='value'),
-#         Input('time_input2', 'value'),
-#     ],
-#     # prevent_initial_callback = True,
-# )
-# def update_cpd_bar2(principal2, rate2, time2):
-#     # if null vals, dont update the graph
-#     if rate2 == None or principal2 == None or time2 == None:
-#         raise dash.exceptions.PreventUpdate
-#     else:
-#         df1 = create_cpd_df(principal2, rate2, time2)
-#         print('UPDATE 2')
-#         print(df1)
-#         fig1 = create_cpd_fig(df1)
-# 
-# 
-#         return [fig1]
 
 @app.callback(
     [
@@ -446,68 +423,6 @@ bar_card2 = dbc.Card(
                         'flex-direction': 'column',
                     },
                 ),
-                # dbc.Container(
-                #     [
-                #         dbc.Row(
-                #             [
-                #                 dcc.Graph(
-                #                     id = 'cpd_bar2',
-                #                     figure = {}
-                #                 ),
-                #             ]
-                #         ),
-                #         # dbc.Row(
-                #         #     [
-                #         #         dbc.Col(
-                #         #             [
-                #         #                 html.Label('Principal: '),
-                #         #                 #principal_input2,
-                #         #             ],
-                #         #             align = 'center',
-                #         #             width = {
-                #         #                 'size': 2.5,
-                #         #             },
-                #         #             style = {
-                #         #                 'display': 'flex',
-                #         #                 'border': 'solid blue',
-                #         #             },
-                #         #         ),
-                #         #         dbc.Col(
-                #         #             [
-                #         #                 html.Label('Rate: '),
-                #         #                 #rate_input2,
-                #         #             ],
-                #         #             align = 'center',
-                #         #             width = {
-                #         #                 'size': 2.5,
-                #         #             },
-                #         #             style = {
-                #         #                 'border': 'solid blue',
-                #         #             }
-                #         #         ),
-                #         #         dbc.Col(
-                #         #             [
-                #         #                 html.Label('Time Period: '),
-                #         #                 #time_input2,
-                #         #             ],
-                #         #             align = 'center',
-                #         #             width = {
-                #         #                 'size': 2.5,
-                #         #             },
-                #         #             style = {
-                #         #                 'border': 'solid blue',
-                #         #             }
-                #         #         ),
-                #         #     ],
-                #         #     justify= 'center'
-                #         # )
-
-                #     ],
-                #     fluid=True,
-                #     style= {
-                #         'border': 'solid yellow',
-                #     },
-                # ),
             ]
         )
     ]
@@ -537,59 +452,10 @@ layout = dbc.Container(
             },
         ),
 
-        # dbc.Row(
-        #     [
-        #         dbc.Col(
-        #             [
-        #                 html.Label('Principal: '),
-        #                 principal_input,
-        #             ],
-        #             align = 'center',
-        #             width = {
-        #                 'size': 2.5,
-        #             },
-        #             style = {
-        #                 'display': 'flex',
-        #                 'border': 'solid blue',
-        #             },
-        #         ),
-        #         dbc.Col(
-        #             [
-        #                 html.Label('Rate: '),
-        #                 rate_input,
-        #             ],
-        #             align = 'center',
-        #             width = {
-        #                 'size': 2.5,
-        #             },
-        #             style = {
-        #                 'border': 'solid blue',
-        #             }
-        #         ),
-        #         dbc.Col(
-        #             [
-        #                 html.Label('Time Period: '),
-        #                 time_input,
-        #             ],
-        #             align = 'center',
-        #             width = {
-        #                 'size': 2.5,
-        #             },
-        #             style = {
-        #                 'border': 'solid blue',
-        #             }
-        #         ),
-        #     ],
-        #     justify = 'start',
-        # ),
 
 
         html.Div(id = 'test_div'),
 
-        # dcc.Graph(
-        #     id = 'cpd_bar',
-        #     figure = {}
-        # ),
         bar_card,
 
 
