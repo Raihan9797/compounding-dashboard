@@ -9,7 +9,7 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
 
 ### create app
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.CYBORG])
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SLATE])
 
 
 ### import and clean data
@@ -115,7 +115,7 @@ def create_cpd_fig_v2(df):
         )
     )
 
-    fig.update_layout(barmode = 'stack')
+    fig.update_layout(barmode = 'stack', template = 'plotly_dark')
     fig.update_layout(
         title="Compounded return over time",
         title_x = 0.5,
@@ -202,23 +202,23 @@ n_label = html.Label('Frequency of Compounding: ')
 principal_input = dcc.Input(
     id = 'principal_input',
     type = 'number',
-    value = 100,
+    value = 0.01,
 )
 rate_input = dcc.Input(
     id = 'rate_input',
     type = 'number',
-    value = 0.05,
+    value = 1.00,
 )
 time_input = dcc.Input(
     id = 'time_input',
     type = 'number',
-    value = 2,
+    value = 30,
 )
 
 con_input = dcc.Input(
     id = 'con_input',
     type = 'number',
-    value = 100,
+    value = 0,
 )
 type_con_input = dcc.Input(
     id = 'type_con_input',
@@ -233,7 +233,7 @@ stop_con_input = dcc.Input(
 n_input = dcc.Input(
     id = 'n_input',
     type = 'number',
-    value = 12,
+    value = 1,
 )
 
 
@@ -241,23 +241,23 @@ n_input = dcc.Input(
 principal_input2 = dcc.Input(
     id = 'principal_input2',
     type = 'number',
-    value = 100,
+    value = 1_000_000,
 )
 rate_input2 = dcc.Input(
     id = 'rate_input2',
     type = 'number',
-    value = 0.05,
+    value = 0.00,
 )
 time_input2 = dcc.Input(
     id = 'time_input2',
     type = 'number',
-    value = 2,
+    value = 30,
 )
 
 con_input2 = dcc.Input(
     id = 'con_input2',
     type = 'number',
-    value = 100,
+    value = 0,
 )
 type_con_input2 = dcc.Input(
     id = 'type_con_input2',
@@ -272,7 +272,7 @@ stop_con_input2 = dcc.Input(
 n_input2 = dcc.Input(
     id = 'n_input2',
     type = 'number',
-    value = 12,
+    value = 1,
 )
 
 ### callbacks
@@ -303,7 +303,20 @@ def plot_merged_bar(df):
         go.Bar(name = 'Amount_y', x = df.Month, y = df.Amount_y, text=df.Amount_y, textposition = 'auto')
     )
 
-    fig.update_layout(barmode = 'group')
+    fig.update_layout(barmode = 'group', template = 'plotly_dark')
+    fig.update_layout(
+        title="Comparing Returns",
+        title_x = 0.5,
+        xaxis_title="Time Periods",
+        yaxis_title="Amount",
+        # legend_title="",
+        hovermode = 'x unified',
+        # font=dict(
+        #     family="Courier New, monospace",
+        #     size=18,
+        #     color="RebeccaPurple"
+        # )
+    )
     return fig
 
 
@@ -360,7 +373,7 @@ def update_bars(
 ### app layout and bigger components
 bar_card = dbc.Card(
     [
-        dbc.CardHeader("Testing header"),
+        # dbc.CardHeader("Testing header"),
         dbc.CardBody(
             [
                 html.Div(
@@ -440,7 +453,7 @@ bar_card = dbc.Card(
 )
 bar_card2 = dbc.Card(
     [
-        dbc.CardHeader("Testing header"),
+        # dbc.CardHeader("Testing header"),
         dbc.CardBody(
             [
                 html.H1('he'),
