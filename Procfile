@@ -1,1 +1,1 @@
-web: gunicorn compounding: server
+web: gunicorn compounding:server
