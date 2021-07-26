@@ -13,29 +13,29 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.CYBORG])
 
 
 ### import and clean data
-def compound_interest(principal, rate, time, dca = 0, n = 1):
-    amount = principal * (1 + rate/(100 * n)) ** (time * n)
-    principal += dca
-    return amount
-
-def compound_interestv2(p, r, t, pmt = 0, n = 12):
-    """
-    p: principal
-    r: interest rate in decimal (3.75% -> 0.0375)
-    t: time in years (do 1/12 for 1 month)
-    pmt: monthly contribution
-    n: number of times compounded per year (12 for monthly, 365 for daily)
-
-    return: amount = cpd growth of principal + cpd growth of contributions
-    """
-    # form1
-    main_val = p * (1 + r / n) ** (n * t)
-    add_val = (pmt * (1 + r / n) ** (n * t) - pmt) / (r / n)
-    print(main_val)
-    print(add_val)
-
-    amount = main_val + add_val
-    return amount
+# def compound_interest(principal, rate, time, dca = 0, n = 1):
+#     amount = principal * (1 + rate/(100 * n)) ** (time * n)
+#     principal += dca
+#     return amount
+# 
+# def compound_interestv2(p, r, t, pmt = 0, n = 12):
+#     """
+#     p: principal
+#     r: interest rate in decimal (3.75% -> 0.0375)
+#     t: time in years (do 1/12 for 1 month)
+#     pmt: monthly contribution
+#     n: number of times compounded per year (12 for monthly, 365 for daily)
+# 
+#     return: amount = cpd growth of principal + cpd growth of contributions
+#     """
+#     # form1
+#     main_val = p * (1 + r / n) ** (n * t)
+#     add_val = (pmt * (1 + r / n) ** (n * t) - pmt) / (r / n)
+#     print(main_val)
+#     print(add_val)
+# 
+#     amount = main_val + add_val
+#     return amount
 
 def cpd_interest_v4(p, r, t, con, type_con, stop_con, n):
     """
@@ -96,6 +96,7 @@ def cpd_interest_v4(p, r, t, con, type_con, stop_con, n):
     print("Total contributions: ", total_contributions)
 
     df = pd.DataFrame(list(zip(months, principals, amounts, interests, cum_interests, contributions, cum_contributions)), columns = ['Month', 'Principal', 'Amount', 'Interest', 'Cumulative_Interest', 'Contribution', 'Cumulative_Contribution'])
+    df = df.round(2)
     return df
 
 def create_cpd_fig_v2(df):
@@ -108,26 +109,42 @@ def create_cpd_fig_v2(df):
         go.Bar(name = 'Contribution', x = df.Month, y = df.Cumulative_Contribution)
     )
     fig.add_trace(
-        go.Bar(name = 'Interest', x = df.Month, y = df.Cumulative_Interest)
+        go.Bar(
+            name = 'Interest', x = df.Month, y = df.Cumulative_Interest,
+            text = df.Amount, textposition = 'auto',
+        )
     )
 
     fig.update_layout(barmode = 'stack')
+    fig.update_layout(
+        title="Compounded return over time",
+        title_x = 0.5,
+        xaxis_title="Time Periods",
+        yaxis_title="Amount",
+        # legend_title="Legend Title",
+        hovermode = 'x unified',
+        # font=dict(
+        #     family="Courier New, monospace",
+        #     size=18,
+        #     color="RebeccaPurple"
+        # )
+    )
     return fig
 
-def create_cpd_df(principal, rate, timespan, dca = 0, n = 1):
-    rows = []
-
-    for t in range(0, timespan + 1):
-        amount = compound_interest(principal, rate, t)
-
-        interest = amount - principal
-        # print(interest)
-        # print(amount)
-        rows.append([t, principal,interest, amount])
-    
-    df = pd.DataFrame(data = rows, columns=['year', 'principal', 'interest', 'amount'], )
-    df = df.round(2)
-    return df
+# def create_cpd_df(principal, rate, timespan, dca = 0, n = 1):
+#     rows = []
+# 
+#     for t in range(0, timespan + 1):
+#         amount = compound_interest(principal, rate, t)
+# 
+#         interest = amount - principal
+#         # print(interest)
+#         # print(amount)
+#         rows.append([t, principal,interest, amount])
+#     
+#     df = pd.DataFrame(data = rows, columns=['year', 'principal', 'interest', 'amount'], )
+#     df = df.round(2)
+#     return df
 
 def create_cpd_fig(df1):
     customdata_df = df1
@@ -272,6 +289,7 @@ def merge_cpd_dfs(df1, df2):
     #     df1 = df1.append(df1.iloc[[-1] * (len2 - len1)]).reset_index(drop=True)
     
     merged_df = df1.merge(df2, on = 'Month', how = 'outer')
+    merged_df = merged_df.round(2)
     return merged_df
 
 
@@ -279,10 +297,10 @@ def plot_merged_bar(df):
     fig = go.Figure()
 
     fig.add_trace(
-        go.Bar(name = 'Amount_x', x = df.Month, y = df.Amount_x)
+        go.Bar(name = 'Amount_x', x = df.Month, y = df.Amount_x, text = df.Amount_x, textposition = 'auto')
     )
     fig.add_trace(
-        go.Bar(name = 'Amount_y', x = df.Month, y = df.Amount_y)
+        go.Bar(name = 'Amount_y', x = df.Month, y = df.Amount_y, text=df.Amount_y, textposition = 'auto')
     )
 
     fig.update_layout(barmode = 'group')
