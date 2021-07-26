@@ -259,9 +259,42 @@ n_input2 = dcc.Input(
 )
 
 ### callbacks
+def merge_cpd_dfs(df1, df2):
+    # df1 more than df2, need to pad df2
+    len1 = len(df1)
+    len2 = len(df2)
+    # if len1 > len2:
+    #     print('len1 > len2')
+
+    #     df2 = df2.append(df2.iloc[[-1] * (len1 - len2)]).reset_index(drop=True)
+    #     print(len(df2))
+    # elif len1 < len2:
+    #     df1 = df1.append(df1.iloc[[-1] * (len2 - len1)]).reset_index(drop=True)
+    
+    merged_df = df1.merge(df2, on = 'Month', how = 'outer')
+    return merged_df
+
+
+def plot_merged_bar(df):
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Bar(name = 'Amount_x', x = df.Month, y = df.Amount_x)
+    )
+    fig.add_trace(
+        go.Bar(name = 'Amount_y', x = df.Month, y = df.Amount_y)
+    )
+
+    fig.update_layout(barmode = 'group')
+    return fig
+
+
+### function to update all bars
 @app.callback(
     [
         Output('cpd_bar', 'figure'),
+        Output('cpd_bar2', 'figure'),
+        Output('merged_bar', 'figure'),
     ],
     [
         Input('principal_input', 'value'),
@@ -272,29 +305,7 @@ n_input2 = dcc.Input(
         Input('type_con_input', 'value'),
         Input('stop_con_input', 'value'),
         Input('n_input', 'value'),
-    ],
-    # prevent_initial_callback = True,
-)
-def update_cpd_bar_v2(principal2, rate2, time2, con, type_con, stop_con, n):
-    # if null vals, dont update the graph
-    if None in [principal2, rate2, time2, con, type_con, stop_con, n ]:
-        raise dash.exceptions.PreventUpdate
-    else:
-        # df1 = create_cpd_df(principal2, rate2, time2)
-        df1 = cpd_interest_v4(principal2, rate2, time2, con, type_con, stop_con, n)
-        print('UPDATE 2')
-        print(df1)
-        fig1 = create_cpd_fig_v2(df1)
 
-
-        return [fig1]
-
-
-@app.callback(
-    [
-        Output('cpd_bar2', 'figure'),
-    ],
-    [
         Input('principal_input2', 'value'),
         Input(component_id='rate_input2', component_property='value'),
         Input('time_input2', 'value'),
@@ -306,20 +317,27 @@ def update_cpd_bar_v2(principal2, rate2, time2, con, type_con, stop_con, n):
     ],
     # prevent_initial_callback = True,
 )
-def update_cpd_bar2(principal2, rate2, time2, con, type_con, stop_con, n):
+def update_bars(
+    principal, rate, time, con, type_con, stop_con, n, 
+    principal2, rate2, time2, con2, type_con2, stop_con2, n2):
     # if null vals, dont update the graph
-    if None in [principal2, rate2, time2, con, type_con, stop_con, n ]:
+    parameters = [
+        principal, rate, time, con, type_con, stop_con, n, 
+        principal2, rate2, time2, con2, type_con2, stop_con2, n2
+        ]
+    if None in parameters:
         raise dash.exceptions.PreventUpdate
     else:
-        # df1 = create_cpd_df(principal2, rate2, time2)
-        df1 = cpd_interest_v4(principal2, rate2, time2, con, type_con, stop_con, n)
-        print('UPDATE 2')
-        print(df1)
+        df1 = cpd_interest_v4(principal, rate, time, con, type_con, stop_con, n)
         fig1 = create_cpd_fig_v2(df1)
 
+        df2 = cpd_interest_v4(principal2, rate2, time2, con2, type_con2, stop_con2, n2)
+        fig2 = create_cpd_fig_v2(df2)
 
-        return [fig1]
+        merged_df = merge_cpd_dfs(df1, df2)
+        merged_fig = plot_merged_bar(merged_df)
 
+        return [fig1, fig2, merged_fig]
 
 ### app layout and bigger components
 bar_card = dbc.Card(
@@ -387,7 +405,7 @@ bar_card = dbc.Card(
                                 ),
                             ],
                             style = {
-                                'border': 'solid pink',
+                                # 'border': 'solid pink',
                                 'display': 'flex',
                                 'justify-content': 'space-around',
                             },
@@ -468,7 +486,7 @@ bar_card2 = dbc.Card(
                                 ),
                             ],
                             style = {
-                                'border': 'solid pink',
+                                # 'border': 'solid pink',
                                 'display': 'flex',
                                 'justify-content': 'space-around',
                             },
@@ -499,12 +517,12 @@ layout = dbc.Container(
                         ),
                     ],
                     style = {
-                        'border': 'solid blue',
+                        # 'border': 'solid blue',
                     }
                 ),
             ],
             style = {
-                'border': 'solid green',
+                # 'border': 'solid green',
             },
         ),
 
@@ -513,15 +531,14 @@ layout = dbc.Container(
         html.Div(id = 'test_div'),
 
         bar_card,
-
-
-
         bar_card2,
+        dcc.Graph(id = 'merged_bar', figure = {})
+
 
 
     ],
     style = {
-        'border': 'solid red',
+        # 'border': 'solid red',
     },
     fluid = True,
 )
