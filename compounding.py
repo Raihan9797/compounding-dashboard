@@ -1,5 +1,6 @@
 import pandas as pd
 import plotly.graph_objects as go
+import plotly.express as px
 
 import dash
 import dash_core_components as dcc
@@ -165,34 +166,59 @@ def cpd_interest_v4_2(p, r, t, con, type_con, start_con, stop_con, n):
 #     df = pd.DataFrame(list(zip(months, principals, amounts, interests, cum_interests, contributions, cum_contributions)), columns = ['Month', 'Principal', 'Amount', 'Interest', 'Cumulative_Interest', 'Contribution', 'Cumulative_Contribution'])
 #     df = df.round(2)
 #     return df
+# def create_cpd_fig_v3(df):
+#     ### trying to use px, stacked value hovers are there but still weird.
+#     fig = px.bar(
+#         df, x="Month"
+#         , y=["Principal", "Cumulative_Contribution", "Cumulative_Interest"]
+#         , title="Wide-Form Input"
+#         , hover_name = "Month"
+#         , hover_data = ["Amount"]
+#         )
+#     return fig
 
 def create_cpd_fig_v2(df):
     fig = go.Figure()
+    ### trying to get a nice hover template which includes
+    ### amt, principak, cuminterest, cumcontribution
+    ### values available, but formatting is really bad.
+    customdata_df = df[['Amount', 'Principal', 'Cumulative_Interest', 'Cumulative_Contribution']]
     hovertemplate = """
-        Total Amount: %{customdata[3]}<br>
-        Interest: %{customdata[2]} <br>
-        Principal: %{customdata[1]} <extra></extra>
+        %{customdata[1]} <br>
+        Total Amount: %{customdata[0]}<br>
         """
-        # "Interest: %{customdata[2]} <br>" +\
-        # "Principal: %{customdata[1]} <br>" +\
-        # "Total Amount : " + "%{customdata[3]}<extra></extra>"
+        # Principal: %{customdata[1]} <br>
+        # Interest: %{customdata[2]} <br>
+        # Contribution: %{customdata[3]} <br>
     print(hovertemplate)
+    print(customdata_df.columns)
 
 
-    fig.add_trace(
-        go.Bar(name = 'Principal', x = df.Month, y = df.Principal)
-    )
-    fig.add_trace(
-        go.Bar(name = 'Contribution', x = df.Month, y = df.Cumulative_Contribution)
-    )
+    fig.add_trace(go.Bar(
+        name = 'Principal',
+        x = df.Month, y = df.Principal,
+        # customdata = customdata_df,
+        # hovertemplate = hovertemplate,
+    ))
+    # fig.add_trace(
+    #     go.Bar(name = 'Principal', x = df.Month, y = df.Principal)
+    # )
+    fig.add_trace(go.Bar(
+        name = 'Contribution'
+        , x = df.Month, y = df.Cumulative_Contribution,
+        # customdata = customdata_df,
+        # hovertemplate = hovertemplate,
+    ))
     fig.add_trace(
         go.Bar(
-            name = 'Interest', x = df.Month, y = df.Cumulative_Interest,
-            textposition = 'auto',
+            name = 'Interest'
+            , x = df.Month, y = df.Cumulative_Interest,
+            textposition = 'auto', text = df.Amount,
         )
     )
 
     fig.update_layout(barmode = 'stack', template = 'plotly_dark')
+    fig.update_traces(texttemplate='%{text:.3s}', textposition='outside')
 
     fig.update_layout(
         title="Compounded return over time",
@@ -302,6 +328,7 @@ time_input = dcc.Input(
     id = 'time_input',
     type = 'number',
     value = 65,
+    step = 1,
 )
 
 con_input = dcc.Input(
@@ -349,6 +376,7 @@ time_input2 = dcc.Input(
     id = 'time_input2',
     type = 'number',
     value = 65,
+    step = 1,
 )
 
 con_input2 = dcc.Input(
@@ -400,10 +428,18 @@ def plot_merged_bar(df):
     fig = go.Figure()
 
     fig.add_trace(
-        go.Bar(name = 'Amount_x1', x = df.Month, y = df.Amount_x, text = df.Amount_x, textposition = 'auto')
+        go.Bar(
+            name = 'Amount_x1', x = df.Month, y = df.Amount_x
+            # , text = df.Amount_x
+            # , textposition = 'outside'
+            )
     )
     fig.add_trace(
-        go.Bar(name = 'Amount_x2', x = df.Month, y = df.Amount_y, text=df.Amount_y, textposition = 'auto')
+        go.Bar(
+            name = 'Amount_x2', x = df.Month, y = df.Amount_y
+            # , text=df.Amount_y
+            # , textposition = 'outside'
+            )
     )
 
     fig.update_layout(barmode = 'group', template = 'plotly_dark')
