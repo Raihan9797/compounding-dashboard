@@ -190,8 +190,8 @@ def create_cpd_fig_v2(df):
         # Principal: %{customdata[1]} <br>
         # Interest: %{customdata[2]} <br>
         # Contribution: %{customdata[3]} <br>
-    print(hovertemplate)
-    print(customdata_df.columns)
+    # print(hovertemplate)
+    # print(customdata_df.columns)
 
 
     fig.add_trace(go.Bar(
