@@ -43,7 +43,7 @@ server = app.server
 #     amount = main_val + add_val
 #     return amount
 
-def cpd_interest_v4(p, r, t, con, type_con, stop_con, n):
+def cpd_interest_v4_2(p, r, t, con, type_con, start_con, stop_con, n):
     """
     p: principal
     r: interest rate in decimal (3.75% -> 0.0375)
@@ -74,7 +74,7 @@ def cpd_interest_v4(p, r, t, con, type_con, stop_con, n):
         months.append(i)
 
         # check when to contribute
-        if i % type_con != 0 or i >= stop_con:
+        if i % type_con != 0 or i < start_con or i > stop_con:
             amount += 0
             total_contributions += 0
             contributions.append(0)
@@ -104,9 +104,79 @@ def cpd_interest_v4(p, r, t, con, type_con, stop_con, n):
     df = pd.DataFrame(list(zip(months, principals, amounts, interests, cum_interests, contributions, cum_contributions)), columns = ['Month', 'Principal', 'Amount', 'Interest', 'Cumulative_Interest', 'Contribution', 'Cumulative_Contribution'])
     df = df.round(2)
     return df
+# def cpd_interest_v4(p, r, t, con, type_con, stop_con, n):
+#     """
+#     p: principal
+#     r: interest rate in decimal (3.75% -> 0.0375)
+#     t: time in years (do 1/12 for 1 month)
+#     con: contribution made
+#     type_con: int, how many times a contribution is made in a year (1 == monthly, 3 == quarterly)
+#     stop_con: months before stopping contributions
+#     n: number of times compounded per year (12 for monthly, 365 for daily)
+# 
+#     return: amount = cpd growth of principal + cpd growth of contributions
+#     """
+#     # try and start simple first: basic compounding
+#     months = []
+#     principals = [p for i in range(1, t*n + 1)]
+# 
+#     amount = p
+#     amounts = []
+# 
+#     interest_earned = 0
+#     interests = []
+#     cum_interest_earned = 0
+#     cum_interests = []
+# 
+#     total_contributions = 0
+#     contributions = []
+#     cum_contributions = []
+#     for i in range(1, t * n + 1):
+#         months.append(i)
+# 
+#         # check when to contribute
+#         if i % type_con != 0 or i >= stop_con:
+#             amount += 0
+#             total_contributions += 0
+#             contributions.append(0)
+#             cum_contributions.append(total_contributions)
+#         else:
+#             # print('adding con')
+#             amount += con
+#             total_contributions += con
+#             contributions.append(con)
+#             cum_contributions.append(total_contributions)
+# 
+# 
+#         old_amount = amount
+#         amount = amount * (1 + r/n)
+#         interest_earned = (amount - old_amount)
+#         interests.append(interest_earned)
+#         cum_interest_earned += amount - old_amount
+# 
+#         cum_interests.append(cum_interest_earned)
+#         # print(amount)
+#         amounts.append(amount)
+# 
+#     print("Final Amount: ", amount)
+#     print("Total interest earned: ", cum_interest_earned)
+#     print("Total contributions: ", total_contributions)
+# 
+#     df = pd.DataFrame(list(zip(months, principals, amounts, interests, cum_interests, contributions, cum_contributions)), columns = ['Month', 'Principal', 'Amount', 'Interest', 'Cumulative_Interest', 'Contribution', 'Cumulative_Contribution'])
+#     df = df.round(2)
+#     return df
 
 def create_cpd_fig_v2(df):
     fig = go.Figure()
+    hovertemplate = """
+        Total Amount: %{customdata[3]}<br>
+        Interest: %{customdata[2]} <br>
+        Principal: %{customdata[1]} <extra></extra>
+        """
+        # "Interest: %{customdata[2]} <br>" +\
+        # "Principal: %{customdata[1]} <br>" +\
+        # "Total Amount : " + "%{customdata[3]}<extra></extra>"
+    print(hovertemplate)
 
 
     fig.add_trace(
@@ -118,7 +188,7 @@ def create_cpd_fig_v2(df):
     fig.add_trace(
         go.Bar(
             name = 'Interest', x = df.Month, y = df.Cumulative_Interest,
-            text = df.Amount, textposition = 'auto',
+            textposition = 'auto',
         )
     )
 
@@ -141,7 +211,7 @@ def create_cpd_fig_v2(df):
     fig.update_layout(legend=dict(
         orientation="h",
         yanchor="bottom",
-        y= -0.4,
+        y= -0.5,
         xanchor="right",
         x=1
     ))
@@ -212,41 +282,48 @@ rate_label = html.Label('Rate: ')
 time_label = html.Label('Time: ')
 con_label = html.Label('Contribution: ')
 type_con_label = html.Label('Frequency of Contribution: ')
-stop_con_label = html.Label('Stop Contribution at month: ')
+start_con_label = html.Label('Start Contribution at period: ')
+stop_con_label = html.Label('Stop Contribution at period: ')
 n_label = html.Label('Frequency of Compounding: ')
 
 principal_input = dcc.Input(
     id = 'principal_input',
     type = 'number',
-    value = 0.01,
+    value = 0.00,
     max = 1_000_000,
     min = -1_000_000,
 )
 rate_input = dcc.Input(
     id = 'rate_input',
     type = 'number',
-    value = 1.00,
+    value = 0.1,
 )
 time_input = dcc.Input(
     id = 'time_input',
     type = 'number',
-    value = 30,
+    value = 65,
 )
 
 con_input = dcc.Input(
     id = 'con_input',
     type = 'number',
-    value = 0,
+    value = 2_000,
 )
 type_con_input = dcc.Input(
     id = 'type_con_input',
     type = 'number',
     value = 1,
+    min = 1,
+)
+start_con_input = dcc.Input(
+    id = 'start_con_input',
+    type = 'number',
+    value = 19,
 )
 stop_con_input = dcc.Input(
     id = 'stop_con_input',
     type = 'number',
-    value = 36,
+    value = 25,
 )
 n_input = dcc.Input(
     id = 'n_input',
@@ -259,35 +336,41 @@ n_input = dcc.Input(
 principal_input2 = dcc.Input(
     id = 'principal_input2',
     type = 'number',
-    value = 1_000_000,
+    value = 0,
     max = 1_000_000,
     min = -1_000_000,
 )
 rate_input2 = dcc.Input(
     id = 'rate_input2',
     type = 'number',
-    value = 0.00,
+    value = 0.1,
 )
 time_input2 = dcc.Input(
     id = 'time_input2',
     type = 'number',
-    value = 30,
+    value = 65,
 )
 
 con_input2 = dcc.Input(
     id = 'con_input2',
     type = 'number',
-    value = 0,
+    value = 2_000,
 )
 type_con_input2 = dcc.Input(
     id = 'type_con_input2',
     type = 'number',
     value = 1,
+    min = 1,
+)
+start_con_input2 = dcc.Input(
+    id = 'start_con_input2',
+    type = 'number',
+    value = 26,
 )
 stop_con_input2 = dcc.Input(
     id = 'stop_con_input2',
     type = 'number',
-    value = 36,
+    value = 65,
 )
 n_input2 = dcc.Input(
     id = 'n_input2',
@@ -362,6 +445,7 @@ def plot_merged_bar(df):
 
         Input('con_input', 'value'),
         Input('type_con_input', 'value'),
+        Input('start_con_input', 'value'),
         Input('stop_con_input', 'value'),
         Input('n_input', 'value'),
 
@@ -371,26 +455,27 @@ def plot_merged_bar(df):
 
         Input('con_input2', 'value'),
         Input('type_con_input2', 'value'),
+        Input('start_con_input2', 'value'),
         Input('stop_con_input2', 'value'),
         Input('n_input2', 'value'),
     ],
     # prevent_initial_callback = True,
 )
 def update_bars(
-    principal, rate, time, con, type_con, stop_con, n, 
-    principal2, rate2, time2, con2, type_con2, stop_con2, n2):
+    principal, rate, time, con, type_con, start_con, stop_con, n, 
+    principal2, rate2, time2, con2, type_con2, start_con2, stop_con2, n2):
     # if null vals, dont update the graph
     parameters = [
-        principal, rate, time, con, type_con, stop_con, n, 
-        principal2, rate2, time2, con2, type_con2, stop_con2, n2
+        principal, rate, time, con, type_con, start_con, stop_con, n, 
+        principal2, rate2, time2, con2, type_con2, start_con2, stop_con2, n2
         ]
     if None in parameters:
         raise dash.exceptions.PreventUpdate
     else:
-        df1 = cpd_interest_v4(principal, rate, time, con, type_con, stop_con, n)
+        df1 = cpd_interest_v4_2(principal, rate, time, con, type_con, start_con, stop_con, n)
         fig1 = create_cpd_fig_v2(df1)
 
-        df2 = cpd_interest_v4(principal2, rate2, time2, con2, type_con2, stop_con2, n2)
+        df2 = cpd_interest_v4_2(principal2, rate2, time2, con2, type_con2, start_con2, stop_con2, n2)
         fig2 = create_cpd_fig_v2(df2)
 
         merged_df = merge_cpd_dfs(df1, df2)
@@ -442,10 +527,12 @@ input_label_row = dbc.Row(
             create_label_input_col(principal_label, principal_input),
             create_label_input_col(rate_label, rate_input),
             create_label_input_col(time_label, time_input),
+            create_label_input_col(n_label, n_input),
+
             create_label_input_col(con_label, con_input),
             create_label_input_col(type_con_label, type_con_input),
+            create_label_input_col(start_con_label, start_con_input),
             create_label_input_col(stop_con_label, stop_con_input),
-            create_label_input_col(n_label, n_input),
         ]
     )
 
@@ -485,10 +572,12 @@ input_label_row2 = dbc.Row(
             create_label_input_col(principal_label, principal_input2),
             create_label_input_col(rate_label, rate_input2),
             create_label_input_col(time_label, time_input2),
+            create_label_input_col(n_label, n_input2),
+
             create_label_input_col(con_label, con_input2),
             create_label_input_col(type_con_label, type_con_input2),
+            create_label_input_col(start_con_label, start_con_input2),
             create_label_input_col(stop_con_label, stop_con_input2),
-            create_label_input_col(n_label, n_input2),
         ]
     )
 bar_card2 = dbc.Card(
