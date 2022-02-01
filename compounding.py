@@ -8,7 +8,13 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 
 ### create app
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SLATE])
+app = dash.Dash(
+    __name__
+    , external_stylesheets=[dbc.themes.BOOTSTRAP]
+    , meta_tags=[
+        {"name": "viewport", "content": "width=device-width, initial-scale=1"},
+    ],
+)
 server = app.server
 
 
@@ -371,6 +377,109 @@ def update_bars(
         return [fig1, fig2, merged_fig]
 
 ### app layout and bigger components
+input_label_listgrp = dbc.ListGroup(
+    [
+        dbc.ListGroupItem(
+            [
+                html.Div(
+                    [
+                        principal_label,
+                        principal_input,
+                    ],
+                    style = {
+                        'display': 'flex',
+                        'flex-direction': 'column',
+                    }
+                ),
+            ]
+        ),
+        dbc.ListGroupItem(
+            [
+                html.Div(
+                    [
+                        rate_label,
+                        rate_input,
+                    ],
+                    style = {
+                        'display': 'flex',
+                        'flex-direction': 'column',
+                    }
+                ),
+            ]
+        ),
+        dbc.ListGroupItem(
+            [
+                html.Div(
+                    [
+                        time_label,
+                        time_input,
+                    ],
+                    style = {
+                        'display': 'flex',
+                        'flex-direction': 'column',
+                    }
+                ),
+            ]
+        ),
+        dbc.ListGroupItem(
+            [
+                html.Div(
+                    [
+                        con_label,
+                        con_input,
+                    ],
+                    style = {
+                        'display': 'flex',
+                        'flex-direction': 'column',
+                    }
+                ),
+            ]
+        ),
+        dbc.ListGroupItem(
+            [
+                html.Div(
+                    [
+                        type_con_label,
+                        type_con_input,
+                    ],
+                    style = {
+                        'display': 'flex',
+                        'flex-direction': 'column',
+                    }
+                ),
+            ]
+        ),
+        dbc.ListGroupItem(
+            [
+                html.Div(
+                    [
+                        stop_con_label,
+                        stop_con_input,
+                    ],
+                    style = {
+                        'display': 'flex',
+                        'flex-direction': 'column',
+                    }
+                ),
+            ]
+        ),
+        dbc.ListGroupItem(
+            [
+                html.Div(
+                    [
+                        n_label,
+                        n_input,
+                    ],
+                    style = {
+                        'display': 'flex',
+                        'flex-direction': 'column',
+                    }
+                ),
+            ]
+        ),
+    ],
+    # horizontal='xl',
+)
 bar_card = dbc.Card(
     [
         # dbc.CardHeader("Testing header"),
@@ -387,60 +496,61 @@ bar_card = dbc.Card(
                             ]
                         ),
                         html.Br(),
-                        html.Div(
-                            [
-                                html.Div(
-                                    [
-                                        principal_label,
-                                        principal_input,
-                                    ]
-                                ),
-                                html.Div(
-                                    [
-                                        rate_label,
-                                        rate_input,
+                        input_label_listgrp,
+                        # html.Div(
+                        #     [
+                        #         html.Div(
+                        #             [
+                        #                 # principal_label,
+                        #                 # principal_input,
+                        #             ]
+                        #         ),
+                        #         html.Div(
+                        #             [
+                        #                 # rate_label,
+                        #                 # rate_input,
 
-                                    ]
-                                ),
-                                html.Div(
-                                    [
-                                        time_label,
-                                        time_input,
+                        #             ]
+                        #         ),
+                        #         html.Div(
+                        #             [
+                        #                 # time_label,
+                        #                 # time_input,
 
-                                    ]
-                                ),
-                                # new addition
-                                html.Div(
-                                    [
-                                        con_label,
-                                        con_input,
-                                    ]
-                                ),
-                                html.Div(
-                                    [
-                                        type_con_label,
-                                        type_con_input,
-                                    ]
-                                ),
-                                html.Div(
-                                    [
-                                        stop_con_label,
-                                        stop_con_input,
-                                    ]
-                                ),
-                                html.Div(
-                                    [
-                                        n_label,
-                                        n_input,
-                                    ]
-                                ),
-                            ],
-                            style = {
-                                # 'border': 'solid pink',
-                                'display': 'flex',
-                                'justify-content': 'space-around',
-                            },
-                        ),
+                        #             ]
+                        #         ),
+                        #         # new addition
+                        #         html.Div(
+                        #             [
+                        #                 # con_label,
+                        #                 # con_input,
+                        #             ]
+                        #         ),
+                        #         html.Div(
+                        #             [
+                        #                 # type_con_label,
+                        #                 # type_con_input,
+                        #             ]
+                        #         ),
+                        #         html.Div(
+                        #             [
+                        #                 # stop_con_label,
+                        #                 # stop_con_input,
+                        #             ]
+                        #         ),
+                        #         html.Div(
+                        #             [
+                        #                 # n_label,
+                        #                 # n_input,
+                        #             ]
+                        #         ),
+                        #     ],
+                        #     style = {
+                        #         # 'border': 'solid pink',
+                        #         'display': 'flex',
+                        #         'justify-content': 'space-around',
+                        #     },
+                        # ),
                     ],
                     style = {
                         'display' : 'flex',
@@ -451,6 +561,56 @@ bar_card = dbc.Card(
         )
     ]
 )
+
+
+def create_label_input_col(x_label, x_input):
+    """
+    Creates a dbc.Col() object for an Input and Label object that is used to change the bar graph.
+
+    """
+    col = dbc.Col(
+        [
+            x_label,
+            x_input,
+        ],
+        width = 6,
+        lg = {
+            'size' : 3,
+        },
+        md = {
+            'size' : 4,
+        },
+        sm = {
+            'size' : 6,
+        },
+        xs = {
+            'size' : 12,
+        },
+        style = {
+            # 'border' : 'solid green',
+            # 'outline-style' : 'solid grey',
+            'border' : '1px solid #ccc',
+            'padding-top': '10px',
+            'padding-bottom': '10px',
+            'display':'flex',
+            'flex-direction':'column',
+            'align-items': 'center',
+        }
+    )
+
+    return col
+
+input_label_row2 = dbc.Row(
+        [
+            create_label_input_col(principal_label, principal_input2),
+            create_label_input_col(rate_label, rate_input2),
+            create_label_input_col(time_label, time_input2),
+            create_label_input_col(con_label, con_input2),
+            create_label_input_col(type_con_label, type_con_input2),
+            create_label_input_col(stop_con_label, stop_con_input2),
+            create_label_input_col(n_label, n_input2),
+        ]
+    )
 bar_card2 = dbc.Card(
     [
         # dbc.CardHeader("Testing header"),
@@ -468,60 +628,7 @@ bar_card2 = dbc.Card(
                             ]
                         ),
                         html.Br(),
-                        html.Div(
-                            [
-                                html.Div(
-                                    [
-                                        principal_label,
-                                        principal_input2,
-                                    ]
-                                ),
-                                html.Div(
-                                    [
-                                        rate_label,
-                                        rate_input2,
-
-                                    ]
-                                ),
-                                html.Div(
-                                    [
-                                        time_label,
-                                        time_input2,
-
-                                    ]
-                                ),
-                                # new addition
-                                html.Div(
-                                    [
-                                        con_label,
-                                        con_input2,
-                                    ]
-                                ),
-                                html.Div(
-                                    [
-                                        type_con_label,
-                                        type_con_input2,
-                                    ]
-                                ),
-                                html.Div(
-                                    [
-                                        stop_con_label,
-                                        stop_con_input2,
-                                    ]
-                                ),
-                                html.Div(
-                                    [
-                                        n_label,
-                                        n_input2,
-                                    ]
-                                ),
-                            ],
-                            style = {
-                                # 'border': 'solid pink',
-                                'display': 'flex',
-                                'justify-content': 'space-around',
-                            },
-                        ),
+                        input_label_row2,
                     ],
                     style = {
                         'display' : 'flex',
@@ -541,7 +648,7 @@ layout = dbc.Container(
                 dbc.Col(
                     [
                         html.H1(
-                            'The Compound Effect Visualized',
+                            'The Compound Effect',
                             style= {
                                 'textAlign': 'center',
                             }
@@ -559,11 +666,11 @@ layout = dbc.Container(
 
 
 
-        html.Div(id = 'test_div'),
 
         bar_card,
         bar_card2,
-        dcc.Graph(id = 'merged_bar', figure = {})
+        dcc.Graph(id = 'merged_bar', figure = {}),
+        html.Br(),
 
 
 
@@ -578,4 +685,4 @@ app.layout = layout
 
 
 if __name__ == '__main__':
-    app.run_server(debug = True)
+    app.run_server(debug = True, use_reloader = True)
