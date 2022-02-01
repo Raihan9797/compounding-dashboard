@@ -10,7 +10,7 @@ from dash.dependencies import Input, Output
 ### create app
 app = dash.Dash(
     __name__
-    , external_stylesheets=[dbc.themes.BOOTSTRAP]
+    , external_stylesheets=[dbc.themes.SLATE]
     , meta_tags=[
         {"name": "viewport", "content": "width=device-width, initial-scale=1"},
     ],
@@ -108,6 +108,7 @@ def cpd_interest_v4(p, r, t, con, type_con, stop_con, n):
 def create_cpd_fig_v2(df):
     fig = go.Figure()
 
+
     fig.add_trace(
         go.Bar(name = 'Principal', x = df.Month, y = df.Principal)
     )
@@ -122,6 +123,7 @@ def create_cpd_fig_v2(df):
     )
 
     fig.update_layout(barmode = 'stack', template = 'plotly_dark')
+
     fig.update_layout(
         title="Compounded return over time",
         title_x = 0.5,
@@ -135,6 +137,14 @@ def create_cpd_fig_v2(df):
         #     color="RebeccaPurple"
         # )
     )
+
+    fig.update_layout(legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y= -0.4,
+        xanchor="right",
+        x=1
+    ))
     return fig
 
 # def create_cpd_df(principal, rate, timespan, dca = 0, n = 1):
@@ -152,49 +162,49 @@ def create_cpd_fig_v2(df):
 #     df = df.round(2)
 #     return df
 
-def create_cpd_fig(df1):
-    customdata_df = df1
-    hovertemplate = """
-        Total Amount: %{customdata[3]}<br>
-        Interest: %{customdata[2]} <br>
-        Principal: %{customdata[1]} <extra></extra>
-        """
-        # "Interest: %{customdata[2]} <br>" +\
-        # "Principal: %{customdata[1]} <br>" +\
-        # "Total Amount : " + "%{customdata[3]}<extra></extra>"
-    print(hovertemplate)
-
-    fig = go.Figure()
-
-    fig.add_trace(go.Bar(
-        name = 'principal',
-        x = df1.year, y = df1.principal,
-        customdata = customdata_df,
-        hovertemplate = hovertemplate,
-    ))
-    fig.add_trace(go.Bar(
-        name = 'interest',
-        x = df1.year, y = df1.interest,
-        customdata = customdata_df,
-        text = df1.amount,
-        hovertemplate = hovertemplate,
-    ))
-    fig.update_layout(barmode = 'stack')
-
-    fig.update_layout(
-        title="Compounded return over time",
-        xaxis_title="Time Periods",
-        yaxis_title="Amount",
-        legend_title="Legend Title",
-        hovermode = 'x unified',
-        # font=dict(
-        #     family="Courier New, monospace",
-        #     size=18,
-        #     color="RebeccaPurple"
-        # )
-    )
-
-    return fig
+# def create_cpd_fig(df1):
+#     customdata_df = df1
+#     hovertemplate = """
+#         Total Amount: %{customdata[3]}<br>
+#         Interest: %{customdata[2]} <br>
+#         Principal: %{customdata[1]} <extra></extra>
+#         """
+#         # "Interest: %{customdata[2]} <br>" +\
+#         # "Principal: %{customdata[1]} <br>" +\
+#         # "Total Amount : " + "%{customdata[3]}<extra></extra>"
+#     print(hovertemplate)
+# 
+#     fig = go.Figure()
+# 
+#     fig.add_trace(go.Bar(
+#         name = 'principal',
+#         x = df1.year, y = df1.principal,
+#         customdata = customdata_df,
+#         hovertemplate = hovertemplate,
+#     ))
+#     fig.add_trace(go.Bar(
+#         name = 'interest',
+#         x = df1.year, y = df1.interest,
+#         customdata = customdata_df,
+#         text = df1.amount,
+#         hovertemplate = hovertemplate,
+#     ))
+#     fig.update_layout(barmode = 'stack')
+# 
+#     fig.update_layout(
+#         title="Compounded return over time",
+#         xaxis_title="Time Periods",
+#         yaxis_title="Amount",
+#         legend_title="Legend Title",
+#         hovermode = 'x unified',
+#         # font=dict(
+#         #     family="Courier New, monospace",
+#         #     size=18,
+#         #     color="RebeccaPurple"
+#         # )
+#     )
+# 
+#     return fig
 
 ### create components
 principal_label = html.Label('Principal: ')
@@ -209,6 +219,8 @@ principal_input = dcc.Input(
     id = 'principal_input',
     type = 'number',
     value = 0.01,
+    max = 1_000_000,
+    min = -1_000_000,
 )
 rate_input = dcc.Input(
     id = 'rate_input',
@@ -248,6 +260,8 @@ principal_input2 = dcc.Input(
     id = 'principal_input2',
     type = 'number',
     value = 1_000_000,
+    max = 1_000_000,
+    min = -1_000_000,
 )
 rate_input2 = dcc.Input(
     id = 'rate_input2',
@@ -303,17 +317,17 @@ def plot_merged_bar(df):
     fig = go.Figure()
 
     fig.add_trace(
-        go.Bar(name = 'Amount_x', x = df.Month, y = df.Amount_x, text = df.Amount_x, textposition = 'auto')
+        go.Bar(name = 'Amount_x1', x = df.Month, y = df.Amount_x, text = df.Amount_x, textposition = 'auto')
     )
     fig.add_trace(
-        go.Bar(name = 'Amount_y', x = df.Month, y = df.Amount_y, text=df.Amount_y, textposition = 'auto')
+        go.Bar(name = 'Amount_x2', x = df.Month, y = df.Amount_y, text=df.Amount_y, textposition = 'auto')
     )
 
     fig.update_layout(barmode = 'group', template = 'plotly_dark')
     fig.update_layout(
         title="Comparing Returns",
         title_x = 0.5,
-        xaxis_title="Time Periods",
+        xaxis_title="Time Period",
         yaxis_title="Amount",
         # legend_title="",
         hovermode = 'x unified',
@@ -323,6 +337,14 @@ def plot_merged_bar(df):
         #     color="RebeccaPurple"
         # )
     )
+
+    fig.update_layout(legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y= -0.4,
+        xanchor="right",
+        x=1
+    ))
     return fig
 
 
@@ -377,192 +399,6 @@ def update_bars(
         return [fig1, fig2, merged_fig]
 
 ### app layout and bigger components
-input_label_listgrp = dbc.ListGroup(
-    [
-        dbc.ListGroupItem(
-            [
-                html.Div(
-                    [
-                        principal_label,
-                        principal_input,
-                    ],
-                    style = {
-                        'display': 'flex',
-                        'flex-direction': 'column',
-                    }
-                ),
-            ]
-        ),
-        dbc.ListGroupItem(
-            [
-                html.Div(
-                    [
-                        rate_label,
-                        rate_input,
-                    ],
-                    style = {
-                        'display': 'flex',
-                        'flex-direction': 'column',
-                    }
-                ),
-            ]
-        ),
-        dbc.ListGroupItem(
-            [
-                html.Div(
-                    [
-                        time_label,
-                        time_input,
-                    ],
-                    style = {
-                        'display': 'flex',
-                        'flex-direction': 'column',
-                    }
-                ),
-            ]
-        ),
-        dbc.ListGroupItem(
-            [
-                html.Div(
-                    [
-                        con_label,
-                        con_input,
-                    ],
-                    style = {
-                        'display': 'flex',
-                        'flex-direction': 'column',
-                    }
-                ),
-            ]
-        ),
-        dbc.ListGroupItem(
-            [
-                html.Div(
-                    [
-                        type_con_label,
-                        type_con_input,
-                    ],
-                    style = {
-                        'display': 'flex',
-                        'flex-direction': 'column',
-                    }
-                ),
-            ]
-        ),
-        dbc.ListGroupItem(
-            [
-                html.Div(
-                    [
-                        stop_con_label,
-                        stop_con_input,
-                    ],
-                    style = {
-                        'display': 'flex',
-                        'flex-direction': 'column',
-                    }
-                ),
-            ]
-        ),
-        dbc.ListGroupItem(
-            [
-                html.Div(
-                    [
-                        n_label,
-                        n_input,
-                    ],
-                    style = {
-                        'display': 'flex',
-                        'flex-direction': 'column',
-                    }
-                ),
-            ]
-        ),
-    ],
-    # horizontal='xl',
-)
-bar_card = dbc.Card(
-    [
-        # dbc.CardHeader("Testing header"),
-        dbc.CardBody(
-            [
-                html.Div(
-                    [
-                        html.Div(
-                            [
-                                dcc.Graph(
-                                    id = 'cpd_bar',
-                                    figure = {}
-                                ),
-                            ]
-                        ),
-                        html.Br(),
-                        input_label_listgrp,
-                        # html.Div(
-                        #     [
-                        #         html.Div(
-                        #             [
-                        #                 # principal_label,
-                        #                 # principal_input,
-                        #             ]
-                        #         ),
-                        #         html.Div(
-                        #             [
-                        #                 # rate_label,
-                        #                 # rate_input,
-
-                        #             ]
-                        #         ),
-                        #         html.Div(
-                        #             [
-                        #                 # time_label,
-                        #                 # time_input,
-
-                        #             ]
-                        #         ),
-                        #         # new addition
-                        #         html.Div(
-                        #             [
-                        #                 # con_label,
-                        #                 # con_input,
-                        #             ]
-                        #         ),
-                        #         html.Div(
-                        #             [
-                        #                 # type_con_label,
-                        #                 # type_con_input,
-                        #             ]
-                        #         ),
-                        #         html.Div(
-                        #             [
-                        #                 # stop_con_label,
-                        #                 # stop_con_input,
-                        #             ]
-                        #         ),
-                        #         html.Div(
-                        #             [
-                        #                 # n_label,
-                        #                 # n_input,
-                        #             ]
-                        #         ),
-                        #     ],
-                        #     style = {
-                        #         # 'border': 'solid pink',
-                        #         'display': 'flex',
-                        #         'justify-content': 'space-around',
-                        #     },
-                        # ),
-                    ],
-                    style = {
-                        'display' : 'flex',
-                        'flex-direction': 'column',
-                    },
-                ),
-            ]
-        )
-    ]
-)
-
-
 def create_label_input_col(x_label, x_input):
     """
     Creates a dbc.Col() object for an Input and Label object that is used to change the bar graph.
@@ -588,8 +424,8 @@ def create_label_input_col(x_label, x_input):
         },
         style = {
             # 'border' : 'solid green',
-            # 'outline-style' : 'solid grey',
-            'border' : '1px solid #ccc',
+            'outline' : '1px solid grey',
+            # 'border' : '1px solid grey',
             'padding-top': '10px',
             'padding-bottom': '10px',
             'display':'flex',
@@ -600,6 +436,50 @@ def create_label_input_col(x_label, x_input):
 
     return col
 
+### row of inputs for first bar chart
+input_label_row = dbc.Row(
+        [
+            create_label_input_col(principal_label, principal_input),
+            create_label_input_col(rate_label, rate_input),
+            create_label_input_col(time_label, time_input),
+            create_label_input_col(con_label, con_input),
+            create_label_input_col(type_con_label, type_con_input),
+            create_label_input_col(stop_con_label, stop_con_input),
+            create_label_input_col(n_label, n_input),
+        ]
+    )
+
+bar_card = dbc.Card(
+    [
+        # dbc.CardHeader("Testing header"),
+        dbc.CardBody(
+            [
+                html.Div(
+                    [
+                        html.Div(
+                            [
+                                dcc.Graph(
+                                    id = 'cpd_bar',
+                                    figure = {}
+                                ),
+                            ]
+                        ),
+                        html.Br(),
+                        input_label_row,
+                    ],
+                    style = {
+                        'display' : 'flex',
+                        'flex-direction': 'column',
+                    },
+                ),
+            ]
+        )
+    ]
+)
+
+
+
+### row of inputs for second bar chart
 input_label_row2 = dbc.Row(
         [
             create_label_input_col(principal_label, principal_input2),
@@ -613,7 +493,7 @@ input_label_row2 = dbc.Row(
     )
 bar_card2 = dbc.Card(
     [
-        # dbc.CardHeader("Testing header"),
+        dbc.CardHeader("Testing header"),
         dbc.CardBody(
             [
                 html.H1('he'),
@@ -640,6 +520,18 @@ bar_card2 = dbc.Card(
     ]
 )
 
+### merged bar card to compare the 2 bar charts
+merged_bar_card = dbc.Card(
+    [
+        dbc.CardBody(
+            [
+                dcc.Graph(id = 'merged_bar', figure = {}),
+            ]
+        )
+    ]
+)
+
+
 
 layout = dbc.Container(
     [
@@ -664,12 +556,10 @@ layout = dbc.Container(
             },
         ),
 
-
-
-
+        ### main components
         bar_card,
         bar_card2,
-        dcc.Graph(id = 'merged_bar', figure = {}),
+        merged_bar_card,
         html.Br(),
 
 
