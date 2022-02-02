@@ -104,6 +104,10 @@ def cpd_interest_v4_2(p, r, t, con, type_con, start_con, stop_con, n):
 
     df = pd.DataFrame(list(zip(months, principals, amounts, interests, cum_interests, contributions, cum_contributions)), columns = ['Month', 'Principal', 'Amount', 'Interest', 'Cumulative_Interest', 'Contribution', 'Cumulative_Contribution'])
     df = df.round(2)
+
+    ### this creates an empty col of 0s. This allows for you to add an "empty bar" that is able to stack on the bar chart and display the "Amount" in the hover with minimal tinkering.
+    df['Amount_Marker'] = 0
+
     return df
 # def cpd_interest_v4(p, r, t, con, type_con, stop_con, n):
 #     """
@@ -183,10 +187,16 @@ def create_cpd_fig_v2(df):
     ### amt, principak, cuminterest, cumcontribution
     ### values available, but formatting is really bad.
     customdata_df = df[['Amount', 'Principal', 'Cumulative_Interest', 'Cumulative_Contribution']]
-    hovertemplate = """
-        %{customdata[1]} <br>
-        Total Amount: %{customdata[0]}<br>
-        """
+    # hovertemplate = """
+    #     %{customdata[1]} <br>
+    #     Total Amount: %{customdata[0]}<br>
+    # <extra>Total Amount: %{customdata[0]:.2f}</extra>
+    #     """
+
+    hovertemplate="""%{customdata[0]::.2f} 
+    """
+    hovertemplate2="""%{customdata[2]}
+    """
         # Principal: %{customdata[1]} <br>
         # Interest: %{customdata[2]} <br>
         # Contribution: %{customdata[3]} <br>
@@ -209,16 +219,38 @@ def create_cpd_fig_v2(df):
         # customdata = customdata_df,
         # hovertemplate = hovertemplate,
     ))
+
+    # this bar is the top stack (ignoring the invisible total amount)
+    # thus we want the Total Amount values to be seen on the bar. hence the text, textposition etc
+    # however, adding this will affect the hovertemplate for this bar. It adds the amount into the bar in a weird way
+    # Thats why hovertemplate and customdata was used. It basically shows the data as if text, textposition etc was not included
     fig.add_trace(
         go.Bar(
             name = 'Interest'
-            , x = df.Month, y = df.Cumulative_Interest,
-            textposition = 'auto', text = df.Amount,
+            , x = df.Month, y = df.Cumulative_Interest
+            , customdata = customdata_df
+            , hovertemplate = hovertemplate2
+            , textposition = 'outside', text = df.Amount, texttemplate = '%{text:.3s}'
+            # , hoverinfo = 'skip'
+        )
+    )
+
+    # this was created because we to display the Total Amount neatly. Tried reworking the hovertemplate but the formatting is just too troublesome.
+    # this bar is basically invisible (opacity) but we want the Total Amount to be available in the hovertemplate. The opacity also makes the box color disappear which is great because its technically useless (all values are 0 from the amount_marker col)
+    fig.add_trace(
+        go.Bar(
+            name = 'Total Amount'
+            , x = df.Month, y = df.Amount_Marker
+            , opacity = 0
+            # , visible = 'legendonly'
+            , textposition = 'outside', text = df.Amount, texttemplate = '%{text:.3s}'
+            , customdata = customdata_df
+            , hovertemplate = hovertemplate
         )
     )
 
     fig.update_layout(barmode = 'stack', template = 'plotly_dark')
-    fig.update_traces(texttemplate='%{text:.3s}', textposition='outside')
+    # fig.update_traces(texttemplate='%{text:.3s}', textposition='outside')
 
     fig.update_layout(
         title="Compounded return over time",
@@ -425,20 +457,34 @@ def merge_cpd_dfs(df1, df2):
 
 
 def plot_merged_bar(df):
+    ## go was used instead of px because we are using long form data. To group it using px, you would have to change the df such that it is just a long list of Month, contribution, amount and a NEW col called Person with values (x or y). That would allow the px to use color = 'Person'.
+    
+    ## however, when using the text in go, these text values will be added into the hovertemplate in an ugly way. So to resolve this, we will be using customdata hovertemplate combo.
+
+    customdata_df = df[['Amount_x', 'Amount_y']]
+    hovertemplate_x1="""%{customdata[0]::.2f} """
+    hovertemplate_x2="""%{customdata[1]}"""
+
     fig = go.Figure()
 
     fig.add_trace(
         go.Bar(
             name = 'Amount_x1', x = df.Month, y = df.Amount_x
-            # , text = df.Amount_x
-            # , textposition = 'outside'
+            , text = df.Amount_x
+            , textposition = 'outside'
+            , texttemplate = '%{text:.3s}'
+            , customdata = customdata_df
+            , hovertemplate = hovertemplate_x1
             )
     )
     fig.add_trace(
         go.Bar(
             name = 'Amount_x2', x = df.Month, y = df.Amount_y
-            # , text=df.Amount_y
-            # , textposition = 'outside'
+            , text=df.Amount_y
+            , textposition = 'outside'
+            , texttemplate = '%{text:.3s}'
+            , customdata = customdata_df
+            , hovertemplate = hovertemplate_x2
             )
     )
 
