@@ -14,4 +14,4 @@ This is a dashboard hosted on Heroku to visualize compounding over time and comp
 2. He is very disciplined. From 26 to 65, he puts $2000 yearly into his savings (ie contribution of $80,000 invested)
 
 #### Assuming both are able to generate returns of 10% per year on their portfolios, whose portfolio will be larger at age 65?
-***John's is admittedly bigger, but the difference is quite negligible at age 65.*** Mary's portfolio would be $945k while John's would be $974k. This is despite Mary only putting in only $14,000 over seven years vs John's $80,000 contribution over 40 years! That's the magic of compounding :). Try the dashboard out and see for yourself.
+***John's is admittedly bigger, but the difference is quite negligible at age 65.*** Mary's portfolio would be $945k while John's would be $974k. This is despite Mary only putting in only $14,000 over seven years vs John's $80,000 contribution over 40 years! That's the magic of compounding :). Try the dashboard out and see for yourself!
