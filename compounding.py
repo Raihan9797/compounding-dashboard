@@ -269,7 +269,7 @@ def create_cpd_fig_v2(df):
     fig.update_layout(legend=dict(
         orientation="h",
         yanchor="bottom",
-        y= -0.5,
+        y= -0.7,
         xanchor="right",
         x=1
     ))
@@ -469,7 +469,7 @@ def plot_merged_bar(df):
 
     fig.add_trace(
         go.Bar(
-            name = 'Amount_x1', x = df.Month, y = df.Amount_x
+            name = "Returns A", x = df.Month, y = df.Amount_x
             , text = df.Amount_x
             , textposition = 'outside'
             , texttemplate = '%{text:.3s}'
@@ -479,7 +479,7 @@ def plot_merged_bar(df):
     )
     fig.add_trace(
         go.Bar(
-            name = 'Amount_x2', x = df.Month, y = df.Amount_y
+            name = "Returns B", x = df.Month, y = df.Amount_y
             , text=df.Amount_y
             , textposition = 'outside'
             , texttemplate = '%{text:.3s}'
@@ -491,7 +491,7 @@ def plot_merged_bar(df):
     fig.update_layout(barmode = 'group', template = 'plotly_dark')
     fig.update_layout(
         title="Comparing Returns",
-        title_x = 0.5,
+        title_x = 0.3,
         xaxis_title="Time Period",
         yaxis_title="Amount",
         # legend_title="",
@@ -623,6 +623,12 @@ bar_card = dbc.Card(
         # dbc.CardHeader("Testing header"),
         dbc.CardBody(
             [
+                html.H1(
+                    'Returns A',
+                    style= {
+                        'textAlign': 'center',
+                    }
+                ),
                 html.Div(
                     [
                         html.Div(
@@ -667,7 +673,12 @@ bar_card2 = dbc.Card(
         dbc.CardHeader("Testing header"),
         dbc.CardBody(
             [
-                html.H1('he'),
+                html.H1(
+                    'Returns B',
+                    style= {
+                        'textAlign': 'center',
+                    }
+                ),
                 html.Div(
                     [
                         html.Div(
@@ -702,6 +713,45 @@ merged_bar_card = dbc.Card(
     ]
 )
 
+### Explanation card of how to use the dashboard
+info_card = dbc.Card(
+    [
+        dbc.CardBody(
+            [
+                dcc.Markdown("""
+                This is a dashboard hosted on Heroku to visualize compounding over time and comparing returns between 2 different "investing" strategies. A simple example has been set as the default values to explain the different inputs.
+
+                #### Example: Mary vs John, and the importance of investing early.
+                *Note: This was adapted from a chapter in the book: Show Me the Money by Teh Hooi Ling.*
+
+                ##### Mary
+                0. Mary does not start with any initial amount for investing
+                    - Principal = 0
+                1. Starts saving at age 19.
+                    - Start contributing = 19
+                2. Saves $2000 from every year from age 19 to 25 and then stops. (ie a total contribution of $14,000 invested)
+                    - Contribution = 2000
+                    - Stop Contributing = 25
+                    - Frequency of contribution = 1 (ie once a year)
+
+                ##### John
+                0. Also does not start with any initial amount for investing
+                1. Starts investing at 26
+                2. He is very disciplined. From 26 to 65, he puts $2000 yearly into his savings (ie contribution of $80,000 invested)
+
+                ##### Assuming both are able to generate returns of 10% per year on their portfolios, whose portfolio will be larger at age 65?
+                - Time = 65
+                - Frequency of compounding = 1 (yearly returns)
+                - rate = 0.1 (10% returns)
+                *  John's is admittedly bigger, but the difference is quite negligible at age 65. ***Mary's portfolio would be $945k while John's would be $974k. This is despite Mary only putting in only $14,000 over seven years vs John's $80,000 contribution over 40 years!*** That's the magic of compounding :). Try the dashboard out and see for yourself!
+                
+                
+                """)
+            ]
+        )
+    ]
+)
+
 
 
 layout = dbc.Container(
@@ -711,7 +761,7 @@ layout = dbc.Container(
                 dbc.Col(
                     [
                         html.H1(
-                            'The Compound Effect',
+                            'The Compound Effect Dashboard',
                             style= {
                                 'textAlign': 'center',
                             }
@@ -728,6 +778,7 @@ layout = dbc.Container(
         ),
 
         ### main components
+        info_card,
         bar_card,
         bar_card2,
         merged_bar_card,
